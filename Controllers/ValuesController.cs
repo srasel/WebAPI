@@ -51,9 +51,95 @@ namespace MvcApplication1.Controllers
 
             //var r = new root { query = new[] { q }, lang = "en" };
             //var j = JsonConvert.SerializeObject(r);
-            return null;
-            
         }
+
+        [HttpGet]
+        [ActionName("datasource")]
+        public DataTable GetDataSource()
+        {
+            var str = WebAPI.Transform.Dimension.Utility.getData("select * from DimDataSource");
+            return str;
+        }
+
+        [HttpGet]
+        [ActionName("indicators")]
+        public IEnumerable<Object> Get()
+        {
+            DataContext dbcontext = new DataContext();
+            return dbcontext.indicator.ToList();
+        }
+
+        [HttpGet]
+        [ActionName("indicatorswdi")]
+        public IEnumerable<WDI_Indicator> GetWDI()
+        {
+            DataContext dbcontext = new DataContext();
+            return dbcontext.indicatorwdi.ToList();
+        }
+
+        [HttpGet]
+        [ActionName("indicatorssub")]
+        public IEnumerable<SubNationalIndicator> GetSub()
+        {
+            DataContext dbcontext = new DataContext();
+            return dbcontext.indicatorsub.ToList();
+        }
+
+        [HttpGet]
+        [ActionName("details")]
+        public DataTable Get([FromUri]Model model)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = new SqlConnection(
+                System.Configuration.ConfigurationManager.
+                    ConnectionStrings["DefaultConnection"].ConnectionString))
+            {
+                conn.Open();
+
+                // 1.  create a command object identifying the stored procedure
+                SqlCommand cmd = new SqlCommand("getAllData", conn);
+
+                // 2. set the command object so it knows to execute a stored procedure
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                // 3. add parameter to command, which will be passed to the stored procedure
+                cmd.Parameters.Add(new SqlParameter("@type", model.type));
+                cmd.Parameters.Add(new SqlParameter("@id", model.productId));
+                cmd.Parameters.Add(new SqlParameter("@startDate", (model.startDate == 0 ? 1000 : model.startDate)));
+                cmd.Parameters.Add(new SqlParameter("@endDate", (model.endDate == 0 ? 3000 : model.endDate)));
+
+                // execute the command
+                //List<DetailsList> dList = new List<DetailsList>();
+                
+                using (SqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    dt.Load(rdr);
+                    //// iterate through results, printing each to console
+                    //while (rdr.Read())
+                    //{
+                    //    //yield return DetailsList.Create(rdr);
+                    //    yield return new DynamicSqlRow(rdr);
+                    //}
+                }
+                return dt;
+            }
+
+            //List<Model> list = new List<Model>();
+            //list.Add(new Model { productId = 1, startDate = 2, endDate = 3 });
+            //list.Add(new Model { productId = 3, startDate = 4, endDate = 5 });
+            //return list;
+
+        }
+
+
+        [HttpGet]
+        [ActionName("getindicatorsofsoruce")]
+        public DataTable GetDataSource([FromUri]string source)
+        {
+            var str = WebAPI.Transform.Dimension.Utility.getData("select * from [dbo].[DimIndicators] where [DataSourceID] =" + source);
+            return str;
+        }
+
 
         [HttpGet]
         [ActionName("dimension")]
@@ -82,8 +168,6 @@ namespace MvcApplication1.Controllers
 
             //var r = new root { query = new[] { q }, lang = "en" };
             //var j = JsonConvert.SerializeObject(r);
-            return null;
-
         }
 
         [HttpGet]
@@ -96,5 +180,14 @@ namespace MvcApplication1.Controllers
         }
 
     }
+
+    public class Model
+    {
+        public int type { get; set; }
+        public int productId { get; set; }
+        public int startDate { get; set; }
+        public int endDate { get; set; }
+    }
+
 
 }

@@ -11,17 +11,10 @@
         <table>
             <tr>
                 <td>
-                    <select name="productId" id="productId">
-                    </select>
-                </td>
-                <td>Start:
-                    <input type="text" name="startDate" id="startDate" />
-                </td>
-                <td>End:
-                    <input type="text" name="endDate" id="endDate" size="10" />
+                    DataSource: <select name="productId" id="productId" onchange=""></select>
                 </td>
                 <td>
-                    <input type="submit" value="Search" onclick="find()" />
+                    <input type="submit" value="Stats" onclick="StatQuery()" />
                 </td>
             </tr>
         </table>
@@ -31,45 +24,17 @@
         <table>
             <tr>
                 <td>
-                    <select name="productIdWDI" id="productIdWDI">
-                    </select>
-                </td>
-                <td>Start:
-                    <input type="text" name="startDateWDI" id="startDateWDI" />
-                </td>
-                <td>End:
-                    <input type="text" name="endDateWDI" id="endDateWDI" size="10" />
+                    <textarea rows="4" cols="50" id="in"></textarea>
                 </td>
                 <td>
-                    <input type="submit" value="Search" onclick="findWDI()" />
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div style="border: 1px solid #808080; position: fixed; top: 60px">
-        <table>
-            <tr>
-                <td>
-                    <select name="productIdSub" id="productIdSub">
-                    </select>
-                </td>
-                <td>Start:
-                    <input type="text" name="startDateSub" id="startDateSub" />
-                </td>
-                <td>End:
-                    <input type="text" name="endDateSub" id="endDateSub" size="10" />
-                </td>
-                <td>
-                    <input type="submit" value="Search" onclick="findSub()" />
+                    <textarea rows="4" cols="50" id="out"></textarea>
                 </td>
             </tr>
         </table>
     </div>
 
 
-
-    <div style="width: 90%; height: 85%; border: 1px solid; position: fixed; float: left; top: 90px; overflow: scroll">
+    <div style="width: 50%; height: 60%; border: 1px solid; position: fixed; float: left; top: 150px; overflow: scroll">
         <p id="product" />
     </div>
 
@@ -87,17 +52,16 @@
         var uri = 'values';
 
         $(document).ready(function () {
-            // Send an AJAX request
-            $.getJSON(uri + '/indicators')
+            $.getJSON(uri + '/datasource')
                 .done(function (data) {
                     // On success, 'data' contains a list of products.
                     $.each(data, function (key, item) {
                         // Add a list item for the product.
-                        $('<option>', { value: item.ID }).html(item.indicator).appendTo($('#productId'));
+                        $('<option>', { value: item.ID }).html(item.DataSource).appendTo($('#productId'));
                     });
                 });
 
-            $.getJSON(uri + '/indicatorswdi')
+            $.getJSON(uri + '/getindicatorsofsoruce')
                 .done(function (data) {
                     // On success, 'data' contains a list of products.
                     $.each(data, function (key, item) {
@@ -114,26 +78,20 @@
                         $('<option>', { value: item.ID }).html(item.indicator).appendTo($('#productIdSub'));
                     });
                 });
-
         });
 
-        function formatItem(item) {
-            return item.Name + ': $' + item.Price;
-        }
-
         function populateData(obj) {
-            $.getJSON(uri + '/details', obj)
+            $.getJSON(uri + '/' + obj, JSON.parse($('#in').val()))
                 .done(function (data) {
                     var derivers = $.pivotUtilities.derivers;
                     var renderers = $.extend(
                         $.pivotUtilities.renderers,
                         $.pivotUtilities.gchart_renderers
                     );
+
+                    $('#out').val(JSON.stringify(data));
+
                     $("#product").pivotUI(
-                        //[
-                        //    { "color": "blue", "shape": "circle" },
-                        //    { "color": "red", "shape": "triangle" }
-                        //],
                         data,
                         {
                             rows: [],
@@ -147,38 +105,18 @@
                 });
         }
 
-        function findSub() {
-            var id = $('#productIdSub').val();
-            var obj = {
-                type: 3,
-                productId: id,
-                startDate: $('#startDateSub').val(),
-                endDate: $('#endDateSub').val()
-            };
-            populateData(obj);
+        function StatQuery() {
+            populateData("stats");
         }
 
-        function findWDI() {
-            var id = $('#productIdWDI').val();
-            var obj = {
-                type:2,
-                productId: id,
-                startDate: $('#startDateWDI').val(),
-                endDate: $('#endDateWDI').val()
-            };
-            populateData(obj);
+        function DimensionQuery() {
+            populateData("dimension");
         }
 
-        function find() {
-            var id = $('#productId').val();
-            var obj = {
-                type:1,
-                productId: id,
-                startDate: $('#startDate').val(),
-                endDate: $('#endDate').val()
-            };
-            populateData(obj);
+        function QuantityQuery() {
+            populateData("quantity");
         }
+
     </script>
 </body>
 </html>

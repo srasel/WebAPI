@@ -65,4 +65,28 @@ namespace WebAPI.Transform.Dimension
         public List<string> dimension { get; set; }
     }
     #endregion
+
+    public class Utility
+    {
+        public static DataTable getData(string query)
+        {
+            DataTable dt = new DataTable();
+
+            using (SqlConnection conn = new SqlConnection(
+                System.Configuration.ConfigurationManager.
+                    ConnectionStrings["DefaultConnection"].ConnectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.CommandType = CommandType.Text;
+                //cmd.Parameters.Add(new SqlParameter("@xml", xml));
+                using (SqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    dt.Load(rdr);
+                }
+            }
+            //return JsonConvert.SerializeObject(dt);
+            return dt;
+        }
+    }
 }
