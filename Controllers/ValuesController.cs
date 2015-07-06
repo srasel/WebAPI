@@ -52,14 +52,7 @@ namespace MvcApplication1.Controllers
         {
             try
             {
-                //TransformUtil.WriteLogToFile("in actual task>" + JsonConvert.SerializeObject(body));
-                //TransformUtil.WriteLogToFile("s>" + body);
-                //var a = JsonConvert.DeserializeObject<stat>(body);
-
-                //if (body.query[0].SELECT.Find(x => x.ToString() == "geo.name") != null)
-                //    return await GetGeoEntitiesAsync(JsonConvert.SerializeObject(body));
-                //else
-                    return await GetStatsAsync(body);
+                return await GetStatsAsync(body);
                 
             }
             catch (Exception ex)
@@ -154,17 +147,6 @@ namespace MvcApplication1.Controllers
             return str;
         }
 
-        //[HttpGet]
-        //[ActionName("geoentities")]
-        //public DataTable GetGeoEntities([FromUri]string json)
-        //{
-        //    var jObj = JsonConvert.DeserializeObject<geoentity>(json);
-        //    GeoEntitiesQuery sQ = new GeoEntitiesQuery(jObj);
-        //    var str = sQ.getData();
-        //    return str;
-        //}
-
-        
 
         [HttpGet]
         [ActionName("indicators")]
@@ -219,20 +201,10 @@ namespace MvcApplication1.Controllers
                 using (SqlDataReader rdr = cmd.ExecuteReader())
                 {
                     dt.Load(rdr);
-                    //// iterate through results, printing each to console
-                    //while (rdr.Read())
-                    //{
-                    //    //yield return DetailsList.Create(rdr);
-                    //    yield return new DynamicSqlRow(rdr);
-                    //}
+                    
                 }
                 return dt;
             }
-
-            //List<Model> list = new List<Model>();
-            //list.Add(new Model { productId = 1, startDate = 2, endDate = 3 });
-            //list.Add(new Model { productId = 3, startDate = 4, endDate = 5 });
-            //return list;
 
         }
 
