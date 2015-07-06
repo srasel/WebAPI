@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace WebAPI.Transform
 {
@@ -14,6 +15,22 @@ namespace WebAPI.Transform
             XmlDocument doc = JsonConvert.DeserializeXmlNode(json, "root");
             //XDocument.Parse(doc.InnerXml);
             return doc.InnerXml;
+        }
+
+        public static void WriteLogToFile(string content)
+        {
+            try
+            {
+                string fileLoc = HttpContext.Current.Server.MapPath(string.Format("~/App_Data/{0}.txt", "Log"));
+                using (StreamWriter sw = File.AppendText(fileLoc))
+                {
+                    sw.WriteLine(DateTime.Now + "\t" + content);
+                }  
+            }
+            catch(Exception)
+            {
+                ;
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ namespace MvcApplication1
     {
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors();
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

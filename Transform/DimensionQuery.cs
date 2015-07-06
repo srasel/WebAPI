@@ -88,5 +88,26 @@ namespace WebAPI.Transform.Dimension
             //return JsonConvert.SerializeObject(dt);
             return dt;
         }
+
+        public static DataTable getDataFromSP(string spName)
+        {
+            DataTable dt = new DataTable();
+
+            using (SqlConnection conn = new SqlConnection(
+                System.Configuration.ConfigurationManager.
+                    ConnectionStrings["DefaultConnection"].ConnectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(spName, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //cmd.Parameters.Add(new SqlParameter("@xml", xml));
+                using (SqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    dt.Load(rdr);
+                }
+            }
+            //return JsonConvert.SerializeObject(dt);
+            return dt;
+        }
     }
 }
